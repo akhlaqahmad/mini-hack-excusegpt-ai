@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXCUSEGPT - AI Social Engineering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.3.1",
+        "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+        "react-dom": "https://esm.sh/react-dom@18.3.1",
+        "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+        "framer-motion": "https://esm.sh/framer-motion@11.3.19?external=react,react-dom",
+        "lucide-react": "https://esm.sh/lucide-react@0.424.0?external=react,react-dom",
+        "clsx": "https://esm.sh/clsx@2.1.1",
+        "tailwind-merge": "https://esm.sh/tailwind-merge@2.5.2"
+      }
+    }
+    </script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chango&family=Rubik+Mono+One&family=Archivo+Black&family=Space+Grotesk:wght@500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --pink: #FF4FB0;
+            --blue: #3D6BFF;
+            --lime: #B6F23D;
+            --sun: #FFC23D;
+            --grape: #9B5CFF;
+            --mint: #2FE0C0;
+            
+            --accent: var(--pink);
+            --r: 18px;
+            
+            --bg: #FBF1E3;
+            --bg-2: #F4E6D2;
+            --panel: #FFFFFF;
+            --card: #FFFFFF;
+            --ink: #1B1430;
+            --muted: #756C8C;
+            --edge: #1B1430;
+            --drop: #1B1430;
+            --field: #FBF6EF;
+            --dot: rgba(27,20,48,0.07);
+
+            --display: "Chango", system-ui;
+            --body: "Space Grotesk", system-ui;
+            --mono: "Space Mono", monospace;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(var(--dot) 1.4px, transparent 1.4px);
+            background-size: 16px 16px;
+            color: var(--ink);
+            font-family: var(--body);
+            font-weight: 600;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .mono { font-family: var(--mono); text-transform: uppercase; letter-spacing: 1px; font-size: 12px; }
+        .display { font-family: var(--display); }
+
+        .eg-chrome {
+            background: linear-gradient(180deg,#fff 4%,#cfe0ff 26%,#7da2ff 48%,#ffffff 52%,#ffd6f4 70%,#ff7fcf 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -webkit-text-stroke: 2px var(--edge);
+            filter: drop-shadow(3px 3px 0 var(--drop));
+            font-family: var(--display);
+            display: inline-block;
+        }
+
+        .eg-sticker {
+            background: var(--card);
+            border: 2.5px solid var(--edge);
+            border-radius: var(--r);
+            box-shadow: 4px 4px 0 var(--drop);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .eg-glossy {
+            position: relative;
+            font-family: var(--display);
+            border-radius: 999px;
+            color: white;
+            border: 2.5px solid var(--edge);
+            box-shadow: 4px 4px 0 var(--drop);
+            text-transform: uppercase;
+            overflow: hidden;
+            transition: transform 0.08s ease, box-shadow 0.08s ease;
+            cursor: pointer;
+            text-shadow: 0 2px 0 rgba(0,0,0,0.2);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .eg-glossy::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 10%; width: 80%; height: 40%;
+            background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0));
+            border-radius: 999px;
+            pointer-events: none;
+        }
+
+        .eg-glossy:active {
+            transform: translate(3px, 3px);
+            box-shadow: 1px 1px 0 var(--drop);
+        }
+
+        .eg-fill-accent { background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 78%, white), var(--accent) 55%, color-mix(in oklab, var(--accent) 72%, black)); }
+        .eg-fill-blue { background: linear-gradient(180deg,#8FB0FF,#3D6BFF 55%,#2247C7); }
+        .eg-fill-ink { background: linear-gradient(180deg,#4A4163,#241B3D 60%,#120C24); }
+
+        .eg-chip {
+            padding: 8px 18px;
+            border-radius: 999px;
+            border: 2px solid var(--edge);
+            box-shadow: 2.5px 2.5px 0 var(--drop);
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.1s ease;
+            background: var(--panel);
+            color: var(--ink);
+        }
+
+        .eg-chip.is-on {
+            background: var(--accent);
+            color: white;
+            transform: translate(1px, 1px);
+            box-shadow: 1.5px 1.5px 0 var(--drop);
+        }
+
+        .eg-input {
+            background: var(--field);
+            border: 2.5px solid var(--edge);
+            border-radius: calc(var(--r) * 0.85);
+            box-shadow: inset 2px 2px 0 rgba(27,20,48,0.06);
+            padding: 16px;
+            color: var(--ink);
+            width: 100%;
+            font-family: var(--body);
+            font-weight: 600;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .eg-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent);
+        }
+
+        .eg-ticker {
+            background: var(--accent);
+            border-top: 2.5px solid var(--edge);
+            border-bottom: 2.5px solid var(--edge);
+            padding: 8px 0;
+            overflow: hidden;
+            display: flex;
+            white-space: nowrap;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .animate-marquee {
+            animation: marquee 18s linear infinite;
+        }
+
+        .star4 {
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel" data-type="module" data-presets="react" src="./script.js"></script>
+</body>
+</html>
